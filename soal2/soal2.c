@@ -74,7 +74,7 @@ int main() {
             char path[300];
             sprintf(path, "/home/rofita/foldermodul2/praktikum2/soal2/%s", MY_TIME);
             chdir(path);
-            for(int i=0;i<10;i++){
+            for(int i=0;i<20;i++){
               child_id2 = fork();
               if (child_id2 < 0) {         
                 exit(EXIT_FAILURE); 
@@ -93,23 +93,23 @@ int main() {
                 execv("/usr/bin/wget", argv);  
 
               }
-              else {
-
+              else { 
+                while ((wait(&status)) > 0);
+                sleep(5);
                 //epoch
-                timespec_get(&ts, TIME_UTC); //call use ts.tv_nsec
-                sprintf(downl, "https://picsum.photos/%ld", (ts.tv_nsec%1000)+100);
-                // $ wget -O nama_tersimpan.zip https://example.co.id/source.zip
-                //time format nama
-                time( &t ); 
-                tmp = localtime( &t );
-                strftime(MY_TIME, sizeof(MY_TIME), "%Y-%m-%d_%X", tmp); 
-                char *argv[] = {"wget","-O", MY_TIME, downl, NULL};
-                execv("/usr/bin/wget", argv);  
-
+                // timespec_get(&ts, TIME_UTC); //call use ts.tv_nsec
+                // sprintf(downl, "https://picsum.photos/%ld", (ts.tv_nsec%1000)+100);
+                // // $ wget -O nama_tersimpan.zip https://example.co.id/source.zip
+                // //time format nama
+                // time( &t ); 
+                // tmp = localtime( &t );
+                // strftime(MY_TIME, sizeof(MY_TIME), "%Y-%m-%d_%X", tmp); 
+                // char *argv[] = {"wget","-O", MY_TIME, downl, NULL};
+                // execv("/usr/bin/wget", argv); 
               }
             } 
         }
-    sleep(30);
+    // sleep(30);
   }
 }
 
