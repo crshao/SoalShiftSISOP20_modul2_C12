@@ -40,9 +40,13 @@ for(i = 1; i < 4; i++)
 			argument[i] = -1;
 		}
 	}
-
-	argument[i] = atoi(argv[i]);
+	else
+	{
+		argument[i] = atoi(argv[i]);
+	}
 }
+
+printf("%d %d %d\n", argument[1], argument[2], argument[3]);
 
 //CEK KELEBIHAN ATAU TIDAK
 check3(argument[1], argument[2], argument[3]);
@@ -84,9 +88,13 @@ while(1) {
 	curr_menit = tm1->tm_min;
 	curr_jam = tm1->tm_hour;
 	
-	if((curr_detik == argument[1] || argument[1] == -1) &&
-	   (curr_menit == argument[2] || argument[2] == -1) &&
-	   (curr_jam == argument[3] || argument[3] == -1))
+	if(
+	   (tm1->tm_sec == argument[1] || argument[1] == -1)
+	   &&
+	   (tm1->tm_min == argument[2] || argument[2] == -1)
+	   &&
+	   (tm1->tm_hour == argument[3] || argument[3] == -1)
+	   )
 	{
 //		printf("TEST");
 		pid_t child_id;
@@ -132,7 +140,7 @@ int check1(char argument[])
 
 int check2(char argument[])
 {
-		printf("DEBUG\n");
+	if(strlen(argument) == 1)
 		if(argument[0] == '*')
 			return 1;
 	
