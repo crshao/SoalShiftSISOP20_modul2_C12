@@ -25,7 +25,7 @@ e. tidak menggunakan system().<br>
 #
 
 ### Jawaban Soal1
-```
+```c
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
@@ -206,6 +206,147 @@ e. Program utama dapat dijalankan dalam 2 mode, yaitu **MODE_A** dan **MODE_B**.
 
 ### Jawaban Soal2
 
+Pertama kita menggunakan daemon untuk menjalankan program yang dapat membuat directory secara otomatis setiap 30s, 
+
+Kemudian di setiap directory diisi 20 foto dengan ukuran yg telah ditentukan yang didownload menggunakan `wget` setiap 5s menggunakan  `sleep`. 
+
+Agar program dapat berjalan bersamaan maka dijalankan menggunakan fungsi fork() terlebih dahulu.
+
+Program melakuka proses zip pada directory yang sudah terisi 20 foto lalu menghapus directory asal
+
+Program memiliki 2 mode kill: 1) langsung menghentikan semua kegiatan operasi 2) menghentikan setelah program selesai menzip seluruh folder
+```c
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+#include <syslog.h>
+#include <wait.h>
+#include <time.h>
+#include <string.h>
+
+int main() {
+  pid_t pid, child_id1, sid, child_id2, child_id3, child_id4,child_id5;        // Variabel untuk menyimpan PID
+
+  int status,stat1,stat2,stat3,stat4;
+
+  //format waktu  
+  time_t t ; 
+  struct tm *tmp ; 
+  char MY_TIME[50],MY_TIME1[50];
+
+  pid = fork();     // Menyimpan PID dari Child Process
+
+  /* Keluar saat fork gagal
+  * (nilai variabel pid < 0) */
+  if (pid < 0) {
+    exit(EXIT_FAILURE);
+  }
+
+  /* Keluar saat fork berhasil
+  * (nilai variabel pid adalah PID dari child process) */
+  if (pid > 0) {
+    exit(EXIT_SUCCESS);
+  }
+
+  umask(0);
+
+  sid = setsid();
+  if (sid < 0) {
+    exit(EXIT_FAILURE);
+  }
+
+  if ((chdir("/")) < 0) {
+    exit(EXIT_FAILURE);
+  }
+
+  // close(STDIN_FILENO);
+  // close(STDOUT_FILENO);
+  // close(STDERR_FILENO);
+
+  while (1) {
+    // Tulis program kalian di sin
+    child_id1 = fork();
+
+        if (child_id1 < 0) {         
+          exit(EXIT_FAILURE); 
+        }
+        if (child_id1 == 0) {
+            time( &t ); 
+            tmp = localtime( &t );
+            strftime(MY_TIME1, sizeof(MY_TIME1), "%Y-%m-%d_%X", tmp); 
+            chdir("/home/rofita/foldermodul2/praktikum2/soal2");
+            char *argv[] = {"mkdir", MY_TIME1, NULL};
+            execv("/bin/mkdir", argv);
+        }
+        else {
+            while((wait(&stat1)) > 0); 
+        }
+    child_id2 = fork();
+        if (child_id2 < 0) {         
+          exit(EXIT_FAILURE); 
+        }
+        if (child_id2 == 0) {
+
+            char downl[300];
+            char path[300];
+            // umask(0);
+            sprintf(path, "/home/rofita/foldermodul2/praktikum2/soal2/%s", MY_TIME1);
+            // chdir(path);
+            for(int i=0;i<20;i++){
+              
+              t = time(NULL);
+                tmp = localtime( &t );
+                //epoch->t
+                sprintf(downl, "https://picsum.photos/%ld", ((t%1000)+100));
+                strftime(MY_TIME, sizeof(MY_TIME), "%Y-%m-%d_%X", tmp); 
+                char path1[300];
+                sprintf(path1, "/home/rofita/foldermodul2/praktikum2/soal2/%s/%s", MY_TIME1,MY_TIME);
+              child_id3 = fork();
+              if (child_id3 < 0) {         
+                    exit(EXIT_FAILURE); 
+              }
+              if (child_id3 == 0) {
+                // chdir(path);
+                char *argv[] = {"wget","-O", path1 , downl, NULL};//{"wget", downl, "-O", MY_TIME, "-o", "/dev/null", NULL};//{"wget","-O", MY_TIME, downl, NULL};
+                execv("/usr/bin/wget", argv);
+              }
+              sleep(5);
+            }
+            
+            while(wait(&stat3) > 0);
+            chdir("..");
+            char ZIP[150];
+            sprintf(ZIP, "%s.zip", MY_TIME1);
+
+            child_id5 = fork();
+
+            if (child_id5 == 0) {
+              char *argv[] = {"zip", "-r", ZIP, MY_TIME1, NULL};
+              execv("/usr/bin/zip", argv);  
+            }
+
+            while (wait(&stat4) > 0);
+
+            child_id4 = fork();
+            if (child_id4 < 0) {         
+                    exit(EXIT_FAILURE); 
+              }
+            
+            if (child_id4 == 0) {
+              char *argv[] = {"rm", "-rf", MY_TIME1, NULL};
+              execv("/bin/rm", argv); 
+            } 
+        }
+    sleep(30);
+  }
+}
+
+```
+
 #
 ## Soal3
 Diminta membuat sebuah program yang dapat mengerjakan tugas yang berbeda tapi harus dikerjakan secara bersamaan atau biasa disebut multiprocessing, dengan ketentuan berikut<br>
@@ -345,6 +486,12 @@ Apabila objek adalah folder, maka pertama child process melakukan fork untuk men
                     }
              .......
 ```
+Berikut Screenshotnya
 
+![Screenshot from 2020-03-21 23-06-13](https://user-images.githubusercontent.com/57274892/77230737-e6523580-6bc8-11ea-812f-089041dd0e57.png)
+![Screenshot from 2020-03-21 23-06-18](https://user-images.githubusercontent.com/57274892/77230739-ea7e5300-6bc8-11ea-9931-0a2328f52eea.png)
+![Screenshot from 2020-03-21 23-06-26](https://user-images.githubusercontent.com/57274892/77230740-ee11da00-6bc8-11ea-8938-7aa233ec5a84.png)
+![Screenshot from 2020-03-21 23-06-30](https://user-images.githubusercontent.com/57274892/77230745-f1a56100-6bc8-11ea-8f3c-e96260aef6b8.png)
+![Screenshot from 2020-03-21 23-06-37](https://user-images.githubusercontent.com/57274892/77230747-f5d17e80-6bc8-11ea-9004-97febc9d5441.png)
 
 
