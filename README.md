@@ -188,7 +188,9 @@ void check3(int detik, int menit, int jam)
 Pada kode diatas, terdapat fungsi check1, check2, check3, yang mana fungsi check1 merupakan fungsi untuk memeriksa apakah argumen yang dimasukkan berupa angka yang valid. Fungsi check2 memeriksa apakah argumen yang dimasukkan merupakan * yang bertanda akan dijalankan pada setiap detik/menit/jam. Fungsi check3 merupakan fungsi yang memeriksa apakah format waktu yang dimasukkan valid. Setelah argumen di periksa, program memulai dengan membuat variabel bertipe data time_t dan struct tm, yang mana variabel bertipe data struct tm menunjuk ke alamatnya time_t untuk mendapatkan waktu saat ini, setelah membuat 2 variabel tersebut, program akan memeriksa argumen yang dimasukkan, dan jika waktu yang dimasukkan menemui ketepatan dengan argumen yang dimasukkan, script yang ada akan dijalankan dengan command bash.
 
 Pada saat mengerjakan, script tidak bisa dijalankan, dikarenakan statement tidak dimasukkan pada block else pada if else,
-
+Kemudian setelah di debug, statement tersebut dimasukkan ke dalam else block
+![Screenshot (117)](https://user-images.githubusercontent.com/47976609/77229227-2f9d8780-6bbf-11ea-911e-1e23aac1929a.png)
+![Screenshot (118)](https://user-images.githubusercontent.com/47976609/77229239-3e843a00-6bbf-11ea-83db-377c63536fa8.png)
 
 
 
